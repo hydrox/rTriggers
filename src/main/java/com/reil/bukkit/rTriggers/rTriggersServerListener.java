@@ -31,9 +31,6 @@ public class rTriggersServerListener extends ServerListener {
         
         String pluginName = event.getPlugin().getDescription().getName();
         if(watchPlugins.contains(pluginName)) plugin.triggerMessages("onload|" + pluginName);
-        
-        if (!plugin.economyMethods.hasMethod() && plugin.economyMethods.setMethod(event.getPlugin()))
-            plugin.economyPlugin = plugin.economyMethods.getMethod();
     }
 	
 	@Override
@@ -42,20 +39,6 @@ public class rTriggersServerListener extends ServerListener {
             if (event.getPlugin().getDescription().getName().equals("Permissions")) {
             	plugin.PermissionsPlugin = null;
                 System.out.println("[rTriggers] Unattached from Permissions.");
-            }
-        }
-        if (plugin.CraftIRCPlugin != null) {
-            if (event.getPlugin().getDescription().getName().equals("CraftIRC")) {
-            	plugin.CraftIRCPlugin = null;
-                System.out.println("[rTriggers] Unattached from CraftIRC.");
-            }
-        }
-
-        // Check to see if the plugin thats being disabled is the one we are using for economy
-        if (plugin.economyMethods != null && plugin.economyMethods.hasMethod()) {
-            if(plugin.economyMethods.checkDisabled(event.getPlugin())) {
-                this.plugin.economyPlugin = null;
-                System.out.println("[rTriggers] Payment method was disabled. No longer accepting payments.");
             }
         }
     }

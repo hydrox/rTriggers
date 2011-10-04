@@ -24,12 +24,8 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.command.*;
 
 // Plugin hooking
-import org.bukkit.croemmich.serverevents.ServerEvents;
-import com.ensifera.animosity.craftirc.CraftIRC;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
-import com.nijikokun.register.payment.Method;
-import com.nijikokun.register.payment.Methods;
 import com.reil.bukkit.rParser.rParser;
 import com.reil.bukkit.rTriggers.persistence.LimitTracker;
 import com.reil.bukkit.rTriggers.persistence.TriggerLimit;
@@ -63,11 +59,7 @@ public class rTriggers extends JavaPlugin {
 	PlayerListener playerListener = new rTriggersPlayerListener(this);
 	EntityListener entityListener = new rTriggersEntityListener(this);
 	
-	public Method economyPlugin = null;
-	public Methods economyMethods;
-	public CraftIRC CraftIRCPlugin;
 	public PermissionHandler PermissionsPlugin;
-	public Plugin ServerEventsPlugin;
     
 	TimeKeeper clock;
 	LimitTracker limitTracker;
@@ -88,7 +80,7 @@ public class rTriggers extends JavaPlugin {
 		MCServer = getServer();
 		bukkitScheduler = MCServer.getScheduler();
 		pluginManager = MCServer.getPluginManager();
-		Console = new ConsoleCommandSender(MCServer);
+		Console = MCServer.getConsoleSender();
 		getDataFolder().mkdir();
         Messages = new rPropertiesFile(getDataFolder().getPath() + "/rTriggers.properties");
         clock = new TimeKeeper(this, bukkitScheduler, 0);
@@ -113,8 +105,6 @@ public class rTriggers extends JavaPlugin {
 			timeZone = new SimpleTimeZone(Messages.getInt("s:timezone")*3600000, "Server Time");
 		} else timeZone = TimeZone.getDefault();
 		
-		if (Messages.keyExists("s:economy")) economyMethods = new Methods(Messages.getString("s:economy").trim());
-		else economyMethods = new Methods();
 		// Do onload events for everything that might have loaded before rTriggers
 		serverListener.checkAlreadyLoaded(pluginManager);
 		
@@ -218,11 +208,6 @@ public class rTriggers extends JavaPlugin {
         	log.info("[rTriggers] Attached to Permissions.");
         }
         
-        Plugin CraftIRCTry = manager.getPlugin("CraftIRC");
-        if (CraftIRCPlugin == null && CraftIRCTry != null){
-        	CraftIRCPlugin = (CraftIRC) CraftIRCTry;
-        	log.info("[rTriggers] Attached to CraftIRC.");
-        }
 	}
 	
 	/*
@@ -385,7 +370,7 @@ public class rTriggers extends JavaPlugin {
 			return;
 		}
 		
-		String [] replace = {"<<recipient>>", "<<recipient-displayname>>", "<<recipient-ip>>", "<<recipient-color>>", "<<recipient-balance>>", "§"};
+		String [] replace = {"<<recipient>>", "<<recipient-displayname>>", "<<recipient-ip>>", "<<recipient-color>>", "<<recipient-balance>>", "ï¿½"};
 		
 		Set <String> sendToGroupsFiltered     = new HashSet <String>();
 		Set <String> dontSendToGroupsFiltered = new HashSet <String>();
@@ -430,11 +415,9 @@ public class rTriggers extends JavaPlugin {
 			else if (group.startsWith("<<hasperm|")) sendToPermissions.add(group.substring(10, group.length() - 2));
 			else if (group.toLowerCase().startsWith("<<player|"))     sendToUs.add(MCServer.getPlayer(group.substring(9, group.length()-2)));
 			else if (group.equalsIgnoreCase("<<command-console>>"))
-				for(String command : message.split("\n")) MCServer.dispatchCommand(Console, command.replaceAll("§.", ""));
-			else if (group.toLowerCase().startsWith("<<craftirc|") && CraftIRCPlugin != null)
-				CraftIRCPlugin.sendMessageToTag(message, group.substring(11, group.length()-2));
+				for(String command : message.split("\n")) MCServer.dispatchCommand(Console, command.replaceAll("ï¿½.", ""));
 			else if (group.equalsIgnoreCase("<<server>>") || group.equalsIgnoreCase("<<console>>")) {
-				String [] with    = {"server", "", "", "", "§", "",};
+				String [] with    = {"server", "", "", "", "ï¿½", "",};
 				log.info("[rTriggers] " + rParser.replaceWords(message, replace, with));
 			}
 			else if (group.startsWith("<<onlyinworld|")) onlyHere = MCServer.getWorld(group.substring(14, group.length() - 2));
@@ -446,13 +429,6 @@ public class rTriggers extends JavaPlugin {
 			}
 			else if (group.equalsIgnoreCase("<<twitter>>")){
 				String [] with    = {"Twitter", "", "", "",""};
-				if (ServerEventsPlugin != null){
-					try {
-						ServerEvents.displayMessage(rParser.replaceWords(message, replace, with));
-					} catch (ClassCastException ex){
-						log.info("[rTriggers] ServerEvents not found!");
-					}
-				} else  log.info("[rTriggers] ServerEvents not found!");
 			} else if (group.equalsIgnoreCase("<<execute>>")){
 				Runtime rt = Runtime.getRuntime();
 				log.info("[rTriggers] Executing:" + message);
@@ -509,7 +485,7 @@ public class rTriggers extends JavaPlugin {
 		if (!flagCommand && !flagSay)
 			for(String sendMe  : message.split("\n")) recipient.sendMessage(sendMe);
 		if (flagCommand)
-			for(String command : message.replaceAll("§.", "").split("\n")) MCServer.dispatchCommand(recipient, command); 
+			for(String command : message.replaceAll("ï¿½.", "").split("\n")) MCServer.dispatchCommand(recipient, command); 
 	}
 
 	/*
@@ -523,7 +499,7 @@ public class rTriggers extends JavaPlugin {
 		String hour   = Integer.toString(time.get(Calendar.HOUR));
 		String hour24 = String.format("%tH", time);
 		String [] replace = {"(?<!\\\\)@", "(?<!\\\\)&", "<<color>>","<<time>>"         ,"<<time\\|24>>"        ,"<<hour>>", "<<minute>>", "<<player-count>>"};
-		String [] with    = {"\n§f"      , "§"         , "§"        ,hour + ":" + minute,hour24 + ":" + minute, hour     , minute,     Integer.toString(MCServer.getOnlinePlayers().length)};
+		String [] with    = {"\nï¿½f"      , "ï¿½"         , "ï¿½"        ,hour + ":" + minute,hour24 + ":" + minute, hour     , minute,     Integer.toString(MCServer.getOnlinePlayers().length)};
 		message = rParser.replaceWords(message, replace, with);
 		return message;
 	}
@@ -605,8 +581,6 @@ public class rTriggers extends JavaPlugin {
 		}
 		// Get balance tag
 		double balance = 0;
-		if (economyPlugin != null && economyPlugin.hasAccount(player.getName()))
-			balance = economyPlugin.getAccount(player.getName()).balance();
 		
 		// Get ip and locale tags
 		InetSocketAddress IP = player.getAddress();
