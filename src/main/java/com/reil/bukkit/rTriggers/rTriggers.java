@@ -588,9 +588,9 @@ public class rTriggers extends JavaPlugin {
 		String locale;
 		String IPString;
 		try {
-			Locale playersHere = net.sf.javainetlocator.InetAddressLocator.getLocale(IP.getAddress());
-			country = playersHere.getDisplayCountry();
-			locale = playersHere.getDisplayName();
+			//Locale playersHere = net.sf.javainetlocator.InetAddressLocator.getLocale(IP.getAddress());
+			country = "";
+			locale = "";
 		} catch (Exception e){
 			e.printStackTrace();
 			country = ""; 
