@@ -370,7 +370,7 @@ public class rTriggers extends JavaPlugin {
 			return;
 		}
 		
-		String [] replace = {"<<recipient>>", "<<recipient-displayname>>", "<<recipient-ip>>", "<<recipient-color>>", "<<recipient-balance>>", "�"};
+		String [] replace = {"<<recipient>>", "<<recipient-displayname>>", "<<recipient-ip>>", "<<recipient-color>>", "<<recipient-balance>>", "§"};
 		
 		Set <String> sendToGroupsFiltered     = new HashSet <String>();
 		Set <String> dontSendToGroupsFiltered = new HashSet <String>();
@@ -415,9 +415,9 @@ public class rTriggers extends JavaPlugin {
 			else if (group.startsWith("<<hasperm|")) sendToPermissions.add(group.substring(10, group.length() - 2));
 			else if (group.toLowerCase().startsWith("<<player|"))     sendToUs.add(MCServer.getPlayer(group.substring(9, group.length()-2)));
 			else if (group.equalsIgnoreCase("<<command-console>>"))
-				for(String command : message.split("\n")) MCServer.dispatchCommand(Console, command.replaceAll("�.", ""));
+				for(String command : message.split("\n")) MCServer.dispatchCommand(Console, command.replaceAll("§.", ""));
 			else if (group.equalsIgnoreCase("<<server>>") || group.equalsIgnoreCase("<<console>>")) {
-				String [] with    = {"server", "", "", "", "�", "",};
+				String [] with    = {"server", "", "", "", "§", "",};
 				log.info("[rTriggers] " + rParser.replaceWords(message, replace, with));
 			}
 			else if (group.startsWith("<<onlyinworld|")) onlyHere = MCServer.getWorld(group.substring(14, group.length() - 2));
@@ -485,7 +485,7 @@ public class rTriggers extends JavaPlugin {
 		if (!flagCommand && !flagSay)
 			for(String sendMe  : message.split("\n")) recipient.sendMessage(sendMe);
 		if (flagCommand)
-			for(String command : message.replaceAll("�.", "").split("\n")) MCServer.dispatchCommand(recipient, command); 
+			for(String command : message.replaceAll("§.", "").split("\n")) MCServer.dispatchCommand(recipient, command); 
 	}
 
 	/*
@@ -499,7 +499,7 @@ public class rTriggers extends JavaPlugin {
 		String hour   = Integer.toString(time.get(Calendar.HOUR));
 		String hour24 = String.format("%tH", time);
 		String [] replace = {"(?<!\\\\)@", "(?<!\\\\)&", "<<color>>","<<time>>"         ,"<<time\\|24>>"        ,"<<hour>>", "<<minute>>", "<<player-count>>"};
-		String [] with    = {"\n�f"      , "�"         , "�"        ,hour + ":" + minute,hour24 + ":" + minute, hour     , minute,     Integer.toString(MCServer.getOnlinePlayers().length)};
+		String [] with    = {"\n§f"      , "§"         , "§"        ,hour + ":" + minute,hour24 + ":" + minute, hour     , minute,     Integer.toString(MCServer.getOnlinePlayers().length)};
 		message = rParser.replaceWords(message, replace, with);
 		return message;
 	}
